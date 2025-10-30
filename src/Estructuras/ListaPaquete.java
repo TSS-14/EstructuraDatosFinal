@@ -34,17 +34,17 @@ public class ListaPaquete {
             return;
         }
 
-        NodoPaquete actual = inicio;
+        NodoPaquete t = inicio;
         System.out.println("=== LISTA DE PAQUETES ===");
-        while (actual != null){
-            System.out.println("Código: " + actual.codigoPaquete +
-                    ", Destino: " + actual.destino +
-                    ", Duración: " + actual.duracionDias + " días" +
-                    ", Tipo: " + actual.tipoPaquete +
-                    ", Precio: $" + actual.precioPaquete +
-                    ", Plazas totales: " + actual.plazasTotales +
-                    ", Plazas disponibles: " + actual.plazaDiponible);
-            actual = actual.siguiente;
+        while (t != null){
+            System.out.println("Código: " + t.codigoPaquete +
+                    "\nDestino: " + t.destino +
+                    "\nDuración: " + t.duracionDias + " días" +
+                    "\nTipo: " + t.tipoPaquete +
+                    "\nPrecio: $" + t.precioPaquete +
+                    "\nPlazas totales: " + t.plazasTotales +
+                    "\nPlazas disponibles: " + t.plazaDiponible);
+            t = t.siguiente;
         }
     }
 
@@ -61,4 +61,46 @@ public class ListaPaquete {
     }
 
     //Metodo para eliminar paquete
+    public boolean eliminarPaquete(String codigo){
+        if (esVacio()){
+            System.out.println("No hay paquetes registrados");
+            return false;
+        }
+
+        //Cabeza
+        if (inicio.codigoPaquete.equalsIgnoreCase(codigo)){
+            inicio = inicio.siguiente;
+            System.out.println("Paquete eliminado correctamente");
+            return true;
+        }
+
+        //Final
+        NodoPaquete anterior = inicio;
+        NodoPaquete actual = inicio.siguiente;
+
+        while (actual != null){
+            if (actual.codigoPaquete.equalsIgnoreCase(codigo)){
+                anterior.siguiente = actual.siguiente;
+                System.out.println("Paquete eliminado correctamente");
+                return true;
+            }
+            anterior = actual;
+            actual = actual.siguiente;
+        }
+
+        System.out.println("Codigo del paquete no encontrado"+codigo);
+        return false;
+    }
+
+    //Metodo para actualiza plazas
+    public void actualizarPlazas(String codigo, int nuevasPlazas){
+        NodoPaquete nuevo = buscarPaquete(codigo);
+        if (nuevo != null){
+            nuevo.plazaDiponible = nuevasPlazas;
+            System.out.println("Plazas actualizadas correctamente");
+        }else {
+            System.out.println("No se encontro el paquete");
+        }
+    }
+
 }

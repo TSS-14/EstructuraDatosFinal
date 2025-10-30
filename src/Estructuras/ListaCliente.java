@@ -105,9 +105,10 @@ public class ListaCliente {
         while (t != null){
             if (t.documento.equalsIgnoreCase(documento)){
                 System.out.println("!Cliente encontrado!");
-                System.out.println("Documento -> "+t.documento+"\nNombre -> "+t.nombre+
-                        "\nEdad -> "+t.edad+"\nGenero -> "+t.genero+"\nCorreo -> "+t.correo+
-                        "\nTelefono -> "+t.telefono+"\nTipo cliente -> "+t.tipoCliente);
+                System.out.println("---------------");
+                System.out.println("Documento: "+t.documento+"\nNombre: "+t.nombre+
+                        "\nEdad: "+t.edad+"\nGenero: "+t.genero+"\nCorreo: "+t.correo+
+                        "\nTelefono: "+t.telefono+"\nTipo de cliente: "+t.tipoCliente);
                 encontrado = true;
                 break;
             }

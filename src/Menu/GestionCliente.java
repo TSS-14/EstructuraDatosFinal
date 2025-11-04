@@ -1,6 +1,6 @@
 package Menu;
 
-import Estructuras.ListaCliente;
+import EstructuraNodos.ListaCliente;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -77,14 +77,19 @@ public class GestionCliente {
                     }
 
                     String genero = "";
-                    int opcionGenero;
+                    int opcionGenero = 0;
                     do {
                         System.out.println("\nSeleccione el genero");
                         System.out.println("1.Masculino");
                         System.out.println("2.Femenino");
                         System.out.println("Opcion:");
-                        opcionGenero = sc.nextInt();
-                        sc.nextLine();
+                        try {
+                            opcionGenero = sc.nextInt();
+                        } catch (InputMismatchException e){
+                            System.out.println("Error: Debe ser un numero.");
+                            sc.nextLine();
+                            continue;
+                        }
 
                         switch (opcionGenero) {
                             case 1 -> genero = "Masculino";
@@ -93,6 +98,7 @@ public class GestionCliente {
                         }
                     } while (opcionGenero < 1 || opcionGenero > 2);
 
+                    sc.nextLine();
                     System.out.println("Ingrese un correo electronico:");
                     String correo = sc.nextLine();
 

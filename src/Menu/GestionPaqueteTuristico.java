@@ -1,6 +1,6 @@
 package Menu;
 
-import Estructuras.ListaPaquete;
+import EstructuraNodos.ListaPaquete;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;

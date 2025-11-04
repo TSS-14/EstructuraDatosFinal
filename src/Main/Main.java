@@ -1,10 +1,12 @@
 package Main;
 
-import Estructuras.ListaCliente;
-import Estructuras.ListaPaquete;
-import Estructuras.ListaServicioAdicional;
+import EstructuraNodos.ListaCliente;
+import EstructuraNodos.ListaPaquete;
+import EstructuraNodos.ListaReservas;
+import EstructuraNodos.ListaServicioAdicional;
 import Menu.GestionCliente;
 import Menu.GestionPaqueteTuristico;
+import Menu.GestionReservas;
 import Menu.GestionServicios;
 
 import java.util.InputMismatchException;
@@ -15,9 +17,11 @@ public class Main {
         ListaPaquete listaPaquete = new ListaPaquete();
         ListaCliente listaCliente = new ListaCliente();
         ListaServicioAdicional listaServicioAdicional = new ListaServicioAdicional();
+        ListaReservas listaReservas = new ListaReservas();
         GestionCliente gestionCliente = new GestionCliente();
         GestionPaqueteTuristico gestionPaqueteTuristico = new GestionPaqueteTuristico();
         GestionServicios gestionServicios = new GestionServicios();
+        GestionReservas gestionReservas = new GestionReservas();
 
         Scanner sc = new Scanner(System.in);
         int opcion = 0;
@@ -51,6 +55,9 @@ public class Main {
                     break;
                 case 3:
                     GestionServicios.menuServicio(listaServicioAdicional, sc);
+                    break;
+                case 4:
+                    GestionReservas.menuReservas(listaReservas,listaCliente,listaPaquete,listaServicioAdicional,sc);
                     break;
             }
         }while (opcion != 8);

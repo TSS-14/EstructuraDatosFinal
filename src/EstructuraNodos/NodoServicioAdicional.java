@@ -1,4 +1,4 @@
-package Estructuras;
+package EstructuraNodos;
 
 public class NodoServicioAdicional {
     String codigoServico;
@@ -10,5 +10,9 @@ public class NodoServicioAdicional {
         this.codigoServico = codigoServicio;
         this.nombreServicio = nombreServicio;
         this.valorServicio = valorServicio;
+    }
+
+    public double getPrecio() {
+        return this.valorServicio;
     }
 }

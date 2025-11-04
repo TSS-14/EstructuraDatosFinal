@@ -1,4 +1,4 @@
-package Estructuras;
+package EstructuraNodos;
 
 public class ListaCliente {
     private NodoCliente inicio;

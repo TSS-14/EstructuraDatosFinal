@@ -1,4 +1,4 @@
-package Estructuras;
+package EstructuraNodos;
 
 public class NodoPaquete {
     String codigoPaquete;
@@ -19,5 +19,9 @@ public class NodoPaquete {
         this.precioPaquete = precioPaquete;
         this.plazasTotales = plazasTotales;
         this.plazaDiponible = plazaDiponible;
+    }
+
+    public double getPrecio() {
+        return this.precioPaquete;
     }
 }

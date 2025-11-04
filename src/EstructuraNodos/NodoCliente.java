@@ -1,4 +1,4 @@
-package Estructuras;
+package EstructuraNodos;
 
 public class NodoCliente {
     String documento;

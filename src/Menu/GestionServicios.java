@@ -1,6 +1,6 @@
 package Menu;
 
-import Estructuras.ListaServicioAdicional;
+import EstructuraNodos.ListaServicioAdicional;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -47,7 +47,7 @@ public class GestionServicios {
                         try {
                             opcionNombreServicio = sc.nextInt();
                         } catch (InputMismatchException e) {
-                            System.out.println("Error: debe ser un numero.");
+                            System.out.println("Error: Debe ser un numero.");
                             sc.nextLine();
                             opcionNombreServicio = 0;
                             continue;

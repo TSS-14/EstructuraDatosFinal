@@ -1,4 +1,4 @@
-package Estructuras;
+package EstructuraNodos;
 
 public class ListaPaquete {
     private NodoPaquete inicio;

@@ -6,6 +6,7 @@ import EstructuraNodos.ListaReservas;
 import EstructuraNodos.ListaServicioAdicional;
 import Menu.GestionCliente;
 import Menu.GestionPaqueteTuristico;
+import Menu.GestionReportes;
 import Menu.GestionReservas;
 import Menu.GestionServicios;
 
@@ -22,6 +23,7 @@ public class Main {
         GestionPaqueteTuristico gestionPaqueteTuristico = new GestionPaqueteTuristico();
         GestionServicios gestionServicios = new GestionServicios();
         GestionReservas gestionReservas = new GestionReservas();
+        GestionReportes gestionReportes = new GestionReportes();
 
         Scanner sc = new Scanner(System.in);
         int opcion = 0;
@@ -40,13 +42,13 @@ public class Main {
             System.out.println("Ingrese su opción:");
             try {
                 opcion = sc.nextInt();
-            } catch (InputMismatchException e){
+            } catch (InputMismatchException e) {
                 System.out.println("Error: Debe ingresar un número.");
                 sc.nextLine();
                 continue;
             }
 
-            switch (opcion){
+            switch (opcion) {
                 case 1:
                     GestionCliente.menuCliente(listaCliente, sc);
                     break;
@@ -57,9 +59,12 @@ public class Main {
                     GestionServicios.menuServicio(listaServicioAdicional, sc);
                     break;
                 case 4:
-                    GestionReservas.menuReservas(listaReservas,listaCliente,listaPaquete,listaServicioAdicional,sc);
+                    GestionReservas.menuReservas(listaReservas, listaCliente, listaPaquete, listaServicioAdicional, sc);
+                    break;
+                case 6:
+                    GestionReportes.menuReportes(listaCliente, listaReservas, listaPaquete, sc);
                     break;
             }
-        }while (opcion != 8);
+        } while (opcion != 8);
     }
 }

@@ -19,6 +19,7 @@ public class NodoPaquete {
         this.precioPaquete = precioPaquete;
         this.plazasTotales = plazasTotales;
         this.plazaDiponible = plazaDiponible;
+        
     }
 
     public double getPrecio() {

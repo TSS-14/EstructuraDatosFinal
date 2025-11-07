@@ -27,6 +27,18 @@ public class ListaPaquete {
         System.out.println("Paquete agregado exitosamente");
     }
 
+   public String obtenerDestino(String codigoPaqueteBuscado) {
+        NodoPaquete actual = inicio;
+        
+        while (actual != null) {
+            if (actual.codigoPaquete.equalsIgnoreCase(codigoPaqueteBuscado)) {
+                return actual.destino; 
+            }
+            actual = actual.siguiente;
+        }
+        
+        return "Destino Desconocido"; 
+    } 
     //Meotodo para mostrar paquetes
     public void mostrarPaquetes(){
         if (esVacio()){

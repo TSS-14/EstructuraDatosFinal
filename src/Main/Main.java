@@ -1,5 +1,8 @@
 package Main;
 
+import EstructuraNodos.ColaClientes;
+import EstructuraNodos.PilaServicios;
+import Menu.GestionSimulacion;
 import EstructuraNodos.ListaCliente;
 import EstructuraNodos.ListaPaquete;
 import EstructuraNodos.ListaReservas;
@@ -24,6 +27,12 @@ public class Main {
         GestionServicios gestionServicios = new GestionServicios();
         GestionReservas gestionReservas = new GestionReservas();
         GestionReportes gestionReportes = new GestionReportes();
+        ColaClientes colaAtencion = new ColaClientes();
+        ColaClientes colaEspera = new ColaClientes();
+        PilaServicios pilaServicios = new PilaServicios();
+
+
+
 
         Scanner sc = new Scanner(System.in);
         int opcion = 0;
@@ -64,6 +73,15 @@ public class Main {
                 case 6:
                     GestionReportes.menuReportes(listaCliente, listaReservas, listaPaquete, sc);
                     break;
+                case 7: 
+                    GestionSimulacion.menuSimulacion(
+                            colaAtencion, 
+                            colaEspera, 
+                            pilaServicios, 
+                            listaCliente, 
+                            sc);
+                    break;
+
             }
         } while (opcion != 8);
     }

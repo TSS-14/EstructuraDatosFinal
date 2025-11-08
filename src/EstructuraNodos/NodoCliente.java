@@ -19,5 +19,8 @@ public class NodoCliente {
         this.genero = genero;
         this.edad = edad;
         this.nombre = nombre;
+}
+        public String getNombre() {
+        return this.nombre;
     }
 }

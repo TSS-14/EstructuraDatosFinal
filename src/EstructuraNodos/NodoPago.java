@@ -20,4 +20,12 @@ public class NodoPago {
         this.estado = "Pendiente";
         this.siguiente = null;
     }
+
+    public String getMedioPago() {
+        return this.metodoPago;
+    }
+
+    public double getMontoTotal() {
+        return this.monto;
+    }
 }

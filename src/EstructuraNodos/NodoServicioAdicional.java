@@ -1,13 +1,14 @@
 package EstructuraNodos;
 
 public class NodoServicioAdicional {
-    String codigoServico;
+    public static int contadorCodigo = 1;
+    int codigoServico;
     String nombreServicio;
     double valorServicio;
     NodoServicioAdicional siguiente;
 
-    public NodoServicioAdicional(String codigoServicio, String nombreServicio, double valorServicio) {
-        this.codigoServico = codigoServicio;
+    public NodoServicioAdicional(String nombreServicio, double valorServicio) {
+        this.codigoServico = contadorCodigo++;
         this.nombreServicio = nombreServicio;
         this.valorServicio = valorServicio;
     }
@@ -15,4 +16,10 @@ public class NodoServicioAdicional {
     public double getPrecio() {
         return this.valorServicio;
     }
+
+    public String getNombre() {
+        return this.nombreServicio;
+    }
+
+
 }

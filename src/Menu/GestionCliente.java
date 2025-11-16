@@ -10,14 +10,15 @@ public class GestionCliente {
         int opcionCliente = 0;
         do {
             System.out.println("\n--GESTIÓN DE CLIENTES--");
-            System.out.println("1.Registrar nuevo cliente");
-            System.out.println("2.Buscar cliente");
-            System.out.println("3.Mostrar clientes");
-            System.out.println("4.Eliminar cliente");
-            System.out.println("5.Volver al menú principal");
+            System.out.println("1. Registrar nuevo cliente");
+            System.out.println("2. Buscar cliente");
+            System.out.println("3. Mostrar clientes");
+            System.out.println("4. Eliminar cliente");
+            System.out.println("5. Volver al menú principal");
             System.out.print("Seleccione una opción: ");
             try {
                 opcionCliente = sc.nextInt();
+                sc.nextLine();
             } catch (InputMismatchException e){
                 System.out.println("Error: Debe ingresar un número.");
                 sc.nextLine();
@@ -27,7 +28,6 @@ public class GestionCliente {
             switch (opcionCliente) {
                 case 1:
                     System.out.println("-- Registro de cliente --");
-                    sc.nextLine();
 
                     String documento = "";
                     boolean documentoValido = false;
@@ -37,10 +37,14 @@ public class GestionCliente {
 
                         if (!documento.matches("\\d+")) {
                             System.out.println("Error, Solo se permite numeros. Intente nuevamente");
+                            continue;
                         }
-                        else {
-                            documentoValido = true;
+
+                        if (gestionCliente.existeClienteRepetido(documento)){
+                            System.out.println("Error. Ya existe una persona registrada con ese ID");
+                            continue;
                         }
+                        documentoValido = true;
                     }
 
                     String nombre = "";
@@ -65,7 +69,7 @@ public class GestionCliente {
                         if (sc.hasNextInt()){
                             edad = sc.nextInt();
                             sc.nextLine();
-                            if (edad < 0 || edad > 100){
+                            if (edad < 10 || edad > 95){
                                 System.out.println("Error, edad invalida. Intente nuevamente.");
                             }else {
                                 edadValida = true;
@@ -119,13 +123,19 @@ public class GestionCliente {
                     }
 
                     String tipoCliente = "";
-                    int opcionTipoCliente;
+                    int opcionTipoCliente = 0;
                     do {
                         System.out.println("\nSeleccione tipo de cliente");
                         System.out.println("1.Particular");
                         System.out.println("2.Empresa");
                         System.out.println("Opción:");
-                        opcionTipoCliente = sc.nextInt();
+                        try {
+                            opcionTipoCliente = sc.nextInt();
+                        } catch (InputMismatchException e){
+                            System.out.println("Error: Debe ser un numero.");
+                            sc.nextLine();
+                            continue;
+                        }
 
                         switch (opcionTipoCliente) {
                             case 1 -> tipoCliente = "Particular";
@@ -138,7 +148,6 @@ public class GestionCliente {
                     break;
                 case 2:
                     System.out.println("-- Buscar Cliente --");
-                    sc.nextLine();
 
                     System.out.println("Ingrese el documento del cliente:");
                     gestionCliente.buscarMostrarCliente(sc.nextLine());
@@ -149,7 +158,6 @@ public class GestionCliente {
                     break;
                 case 4:
                     System.out.println("-- Eliminar Cliente --");
-                    sc.nextLine();
 
                     System.out.println("Ingrese el documento del cliente:");
                     gestionCliente.eliminarCliente(sc.nextLine());

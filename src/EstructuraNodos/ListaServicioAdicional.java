@@ -13,15 +13,27 @@ public class ListaServicioAdicional {
     }
 
     //Metodo para agregar servicio
-    public void agregarServicio(String codigo, String nombreServicio, double valorServicio){
-        NodoServicioAdicional nuevo = new NodoServicioAdicional(codigo, nombreServicio, valorServicio);
+    public void agregarServicio(String nombreServicio, double valorServicio){
+        NodoServicioAdicional nuevo = new NodoServicioAdicional(nombreServicio, valorServicio);
         if (esVacio()){
             inicio = nuevo;
             nuevo.siguiente = null;
         }else {
-            nuevo.siguiente = nuevo;
+            nuevo.siguiente = inicio;
             inicio = nuevo;
         }
+    }
+
+    //Metodo si el id esta repetido
+    public boolean codigoServicioRepetido(int codigo){
+        NodoServicioAdicional actual = inicio;
+        while (actual != null){
+            if (actual.codigoServico == codigo){
+                return true;
+            }
+            actual = actual.siguiente;
+        }
+        return false;
     }
 
     //Metodo para ver servicios
@@ -36,17 +48,18 @@ public class ListaServicioAdicional {
         while (t != null){
             System.out.println("Codigo del servicio: "+t.codigoServico+"\nNombre del servicio: "+t.nombreServicio+
                                 "\nValor del servicio: "+t.valorServicio);
+            System.out.println("---------------");
             t = t.siguiente;
         }
     }
     //Metodo para eliminar paquete
-    public boolean eliminarPaquete(String codigo){
+    public boolean eliminarPaquete(int codigo){
         if (esVacio()){
             System.out.println("No hay paquetes registrados");
         }
 
         //Cabeza
-        if (inicio.codigoServico.equalsIgnoreCase(codigo)){
+        if (inicio.codigoServico == codigo){
             inicio = inicio.siguiente;
             System.out.println("Servicio eliminado correctamente");
             return true;
@@ -57,7 +70,7 @@ public class ListaServicioAdicional {
         NodoServicioAdicional actual = inicio.siguiente;
 
         while (actual != null){
-            if (actual.codigoServico.equalsIgnoreCase(codigo)){
+            if (actual.codigoServico == codigo){
                 anterior.siguiente = actual.siguiente;
                 System.out.println("Servicio eliminado correctamente");
                 return true;
@@ -70,7 +83,7 @@ public class ListaServicioAdicional {
     }
 
     //Metodo para actualizar valor del servicio
-    public void actualizarValorServicio(String codigo, double valorServicio){
+    public void actualizarValorServicio(int codigo, double valorServicio){
         NodoServicioAdicional nuevo = buscarServicio(codigo);
         if (nuevo != null){
             nuevo.valorServicio = valorServicio;
@@ -81,10 +94,10 @@ public class ListaServicioAdicional {
     }
 
     //Metodo para buscar servicio
-    public NodoServicioAdicional buscarServicio(String codigo){
+    public NodoServicioAdicional buscarServicio(int codigo){
         NodoServicioAdicional actual = inicio;
         while (actual != null){
-            if (actual.codigoServico.equalsIgnoreCase(codigo)){
+            if (actual.codigoServico == codigo){
                 return actual;
             }
             actual = actual.siguiente;

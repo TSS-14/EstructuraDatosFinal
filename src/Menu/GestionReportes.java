@@ -2,105 +2,98 @@ package Menu;
 
 import EstructuraNodos.ListaCliente;
 import EstructuraNodos.ListaReservas;
-import EstructuraNodos.ListaPaquete; 
+import EstructuraNodos.ListaPaquete;
+import EstructuraNodos.ListaPagos;
+import EstructuraNodos.ColaClientes;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class GestionReportes {
 
-    public static void menuReportes(ListaCliente gestionCliente, ListaReservas gestionReserva, ListaPaquete gestionPaquete, Scanner sc){
+    public static void menuReportes(ListaCliente gestionCliente, ListaReservas gestionReserva, ListaPaquete gestionPaquete, ListaPagos gestionPagos, ColaClientes colaAtencion, Scanner sc){
         int opcionReporte = 0;
         
         do {
-            System.out.println("\n--- GESTIÓN DE REPORTES Y ESTADÍSTICAS ---");
-            System.out.println("-----------------------------------------");
-            System.out.println("📊 REPORTES DE RESERVAS Y FACTURACIÓN");
-            System.out.println("1.  Reservas por Estado (Cantidad y Porcentaje)");
-            System.out.println("2.  Monto Total Facturado (Confirmado)");
-            System.out.println("3.  Monto Recaudado por Paquete y Destino");
-            System.out.println("4.  Monto Recaudado por Servicios Adicionales");
-            System.out.println("5.  Monto Total de Descuentos Aplicados");
-            System.out.println("6.  Porcentaje de Reservas con Servicios Vendidos");
-            System.out.println("7.  Cliente con Mayor y Menor Gasto");
-            
-            System.out.println("\n👤 REPORTES DE CLIENTES Y DEMOGRAFÍA");
-            System.out.println("8.  Clientes por Género");
-            System.out.println("9.  Clientes por Rango de Edad (Cantidad)");
-            System.out.println("10. Monto Recaudado por Rango de Edad");
-            
-            System.out.println("\n--- PENDIENTES ---");
-            System.out.println("11. Reporte de Medios de Pago (Requiere implementación de Pagos)");
-            System.out.println("12. Volver al menú principal");
-            System.out.print("\nSeleccione una opción: ");
-            
+            System.out.println("\n--REPORTES Y ESTADÍSTICAS--");
+            System.out.println("---------------------------------------------");
+            System.out.println("=== RESERVAS Y FACTURACIÓN ===");
+            System.out.println("1. Total de reservas realizadas y confirmadas");
+            System.out.println("2. Monto total facturado (paquetes + servicios)");
+            System.out.println("3. Monto recaudado por cada medio de pago");
+            System.out.println("4. Monto recaudado por paquete (por destino)");
+            System.out.println("5. Monto total de descuentos aplicados");
+            System.out.println("6. Cliente que más gastó y que menos gastó");
+            System.out.println("7. Porcentaje de reservas confirmadas / pendientes / canceladas");
+            System.out.println("8. Ocupación por paquete");
+            System.out.println("9. Porcentaje de reservas por tipo (nacional/Internacional)");
+            System.out.println("10. Promedio de plazas vendidas por paquete");
+            System.out.println("11. Porcentaje de servicios vendidos");
+            System.out.println("---------------------------------------------");
+            System.out.println("=== CLIENTES Y DEMOGRAFÍA ===");
+            System.out.println("12. Clientes atendidos por género");
+            System.out.println("13. Estadísticas por rango de edad");
+            System.out.println("14. Personas en cola de atención");
+            System.out.println("15. Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
             try {
                 opcionReporte = sc.nextInt();
+                sc.nextLine();
             } catch (InputMismatchException e){
                 System.out.println("Error: Debe ingresar un número.");
-                sc.nextLine(); // Limpiar buffer
+                sc.nextLine();
                 continue;
             }
-            sc.nextLine(); // Limpiar buffer
-
-            System.out.println("-----------------------------------------");
 
             switch (opcionReporte) {
-                // REPORTES DE RESERVAS Y FACTURACIÓN
                 case 1:
-                    // R1: Cantidad de reservas por estado y porcentaje.
-                    gestionReserva.reporteEstadoReservas(); 
+                    gestionReserva.contadorReservas();
                     break;
                 case 2:
-                    // R3: Monto total facturado.
-                    gestionReserva.calcularMontoTotalFacturado();
+                    gestionReserva.montoTotalConfirmado();
                     break;
                 case 3:
-                    // R5: Monto recaudado por paquete (por destino).
-                    gestionReserva.reporteMontoPorPaquete(gestionPaquete);
+                    gestionReserva.montoPorMedioDePago(gestionPagos);
                     break;
                 case 4:
-                    // R6: Monto recaudado por cada servicio adicional.
-                    gestionReserva.reporteMontoPorServicio();
+                    gestionReserva.montoTotalPaquete();
                     break;
                 case 5:
-                    // R7: Monto total de descuentos aplicados.
-                    gestionReserva.calcularMontoTotalDescuentos();
+                    gestionReserva.montoTotalDescuentos();
                     break;
                 case 6:
-                    // R15: Porcentaje de servicios vendidos respecto al total de reservas.
-                    gestionReserva.reportePorcentajeServiciosVendidos();
+                    gestionReserva.clienteMayorMenorGasto();
                     break;
                 case 7:
-                    // R8: Cliente que más gastó y cliente que menos gastó.
-                    gestionReserva.reporteClienteMayorMenorGasto(gestionCliente);
+                    gestionReserva.porcentajeEstadoReservas();
                     break;
-                
-                // REPORTES DE CLIENTES Y DEMOGRAFÍA
                 case 8:
-                    // R2: Cantidad de clientes por género.
-                    gestionCliente.contarClientesPorGenero();
+                    gestionReserva.ocupacionPorPaquete();
                     break;
                 case 9:
-                    // R13a: Estadísticas por rango de edad (Cantidad de clientes).
-                    gestionCliente.contarClientesPorRangoEdad();
+                    gestionReserva.porcentajeReservasPorTipo();
                     break;
                 case 10:
-                    // R13b: Estadísticas por rango de edad (Monto recaudado).
-                    gestionCliente.reporteMontoRecaudadoPorEdad(gestionReserva);
+                    gestionReserva.promedioPlazasVendidasPorPaquete();
                     break;
-                    
-                // PENDIENTES / SALIR
                 case 11:
-                    // R4: Monto recaudado por cada medio de pago.
-                    System.out.println("\nEl Reporte de Medios de Pago está pendiente de implementación.");
+                    gestionReserva.porcentajeServiciosVendidos();
                     break;
                 case 12:
+                    gestionCliente.clientesPorGenero();
+                    break;
+                case 13:
+                    gestionCliente.estadisticasPorEdad();
+                    break;
+                case 14:
+                    colaAtencion.contarPersonasEnCola();
+                    break;
+                case 15:
                     System.out.println("Volviendo al menú principal.");
                     break;
                 default:
                     System.out.println("Opción inválida. Intente nuevamente.");
             }
-        } while (opcionReporte != 12);
+        } while (opcionReporte != 15);
     }
 }

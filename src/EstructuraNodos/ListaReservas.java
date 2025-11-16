@@ -1,33 +1,28 @@
 package EstructuraNodos;
 
-import EstructuraNodos.ListaCliente;
-import EstructuraNodos.ListaPaquete;
+import java.time.LocalDate;
+import java.util.Scanner;
 
 public class ListaReservas {
     private NodoReserva inicio;
-
 
 
     public ListaReservas() {
         inicio = null;
     }
 
-    // Método para acceder al inicio de la lista (necesario para reportes externos)
-    public NodoReserva getInicio() {
-        return inicio;
-    }
-
-    // Método si está vacía
+    // Metodo si esta vacia
     public boolean esVacio() {
         return inicio == null;
     }
 
-   
 
     // Metodo para crear reserva
-    public void crearReserva(NodoCliente cliente, NodoPaquete paquete, NodoServicioAdicional servicioAdicional,
-            int cantidadPersona, String estado, double montoTotal) {
-        NodoReserva nuevo = new NodoReserva(cliente, paquete, servicioAdicional, cantidadPersona, estado, montoTotal);
+    public void crearReserva(NodoCliente cliente, NodoPaquete paquete, NodoServicioAdicional[] servicioAdicional,
+                             int cantidadPersona, String estado, double montoTotal, double montoDescuento,
+                             double montoRecargo, String codigoPromocio, LocalDate fechaReserva, String medioPago) {
+        NodoReserva nuevo = new NodoReserva(cliente, paquete, servicioAdicional, cantidadPersona, estado, montoTotal,
+                                            montoDescuento, montoRecargo, codigoPromocio, fechaReserva, medioPago);
         if (esVacio()) {
             inicio = nuevo;
         } else {
@@ -37,23 +32,20 @@ public class ListaReservas {
         System.out.println("Reserva creada exitosamente con código: " + nuevo.codigo);
     }
 
+    public double calcularMontoReserva(int codigoReserva) {
+        NodoReserva reserva = buscarReservaPorCodigo(codigoReserva);
+        if (reserva == null) return 0;
+        return reserva.montoTotal;
+    }
+
     // Metodo para confirmar reserva
     public void confirmarReserva(int codigoReserva) {
         NodoReserva aux = inicio;
 
         while (aux != null) {
             if (aux.codigo == codigoReserva) {
-                NodoPaquete paquete = aux.paquete;
-
-                // CORRECCIÓN: Se asume que el campo es 'plazasDisponible'
-                if (paquete.plazaDiponible >= aux.cantidadPersonas) {
-                    paquete.plazaDiponible -= aux.cantidadPersonas;
-                    aux.estado = "Confirmado";
-                    System.out.println("Reserva confirmada");
-                } else {
-                    aux.estado = "Pendiente";
-                    System.out.println("No hay plazas disponibles. La reserva queda pendiente.");
-                }
+                aux.estado = "Confirmado";
+                System.out.println("Reserva confirmada");
                 return;
             }
             aux = aux.siguiente;
@@ -85,6 +77,7 @@ public class ListaReservas {
         NodoReserva aux = inicio;
         while (aux != null) {
             System.out.println("\n== RESERVA CÓDIGO: " + aux.codigo + " ==");
+            System.out.println("Estado: " + aux.estado);
 
             // Datos del cliente
             System.out.println("\nCliente: " + aux.cliente.nombre +
@@ -98,259 +91,464 @@ public class ListaReservas {
                     "\nDuracion: " + aux.paquete.duracionDias + " días" +
                     "\nPrecio paquete: $" + aux.paquete.precioPaquete);
 
-            // Datos propios de la reserva
+            // Servicios adicionales contratados
+            String nombreServicio = "Sin servicio adicional";
+            if (aux.servicioAdicional != null && aux.servicioAdicional.length > 0) {
+                nombreServicio = "";
+                for (int i = 0; i < aux.servicioAdicional.length; i++) {
+                    if (aux.servicioAdicional[i] != null) {
+                        nombreServicio += aux.servicioAdicional[i].nombreServicio;
+                        if (i < aux.servicioAdicional.length - 1) {
+                            nombreServicio += ", ";
+                        }
+                    }
+                }
+                if (nombreServicio.isEmpty()) {
+                    nombreServicio = "Sin servicio adicional";
+                }
+            }
             System.out.println("\n----------");
-            String nombreServicio = aux.servicioAdicional != null ? aux.servicioAdicional.nombreServicio : "Sin servicio adicional";
-            System.out.println("Cantidad de personas: " + aux.cantidadPersonas +
-                    "\nServicios adicionales: " + nombreServicio +
-                    "\nEstado: " + aux.estado +
-                    "\nMonto total: $" + aux.montoTotal);
+            System.out.println("Servicios adicionales contratados: \n" + nombreServicio);
+
+            System.out.println("\n----------");
+            System.out.println("Monto total: $"+aux.montoTotal);
+
+
 
             aux = aux.siguiente;
         }
     }
 
-   
-
-    // Metodo reporte: Estado de reservas
-    public void reporteEstadoReservas() {
-        if (esVacio()) {
-            System.out.println("No hay reservas registradas para generar el reporte de estado.");
-            return;
-        }
-
+    //Metodo para contar reservas hechas y reservas confirmadas
+    public void contadorReservas(){
         int totalReservas = 0;
-        int confirmadas = 0;
-        int pendientes = 0;
-        int canceladas = 0;
-
-        NodoReserva actual = inicio;
-        while (actual != null) {
+        int reservasConfirmadas = 0;
+        NodoReserva aux = inicio;
+        while (aux != null){
             totalReservas++;
-            String estado = actual.estado.toLowerCase();
+            if (aux.estado.equalsIgnoreCase("Confirmado")){
+                reservasConfirmadas++;
+            }
+            aux = aux.siguiente;
+        }
+        System.out.println("Total de reservas: "+totalReservas);
+        System.out.println("Total de reservas confirmadas: "+ reservasConfirmadas);
+    }
 
-            if (estado.contains("confirmado")) {
-                confirmadas++;
-            } else if (estado.contains("pendiente")) {
-                pendientes++;
-            } else if (estado.contains("cancelado")) {
-                canceladas++;
+    //Metodo para el monto total facturado de reservas confirmadas
+    public void montoTotalConfirmado(){
+        double montoTotal = 0;
+        NodoReserva aux = inicio;
+        while (aux != null){
+            if (aux.estado.equalsIgnoreCase("Confirmado")){
+                montoTotal += aux.montoTotal;
+            }
+            aux = aux.siguiente;
+        }
+        System.out.println("Monto total facturado (reservas confirmadas):"+montoTotal);
+    }
+
+    //Metodo para calcular lo recaudado por paquete
+    public void montoTotalPaquete(){
+        if (esVacio()){
+            System.out.println("No hay reservas registradas");
+            return;
+        }
+        NodoReserva aux = inicio;
+        double totalPaquetes = 0;
+        while (aux != null){
+            if (aux.estado.equalsIgnoreCase("Confirmado")){
+                totalPaquetes += aux.paquete.precioPaquete;
+            }
+            aux = aux.siguiente;
+        }
+        System.out.println("Monto total neto de paquetes confirmados :"+totalPaquetes);
+    }
+
+    public int contarReservasPorClienteEnAnio(NodoCliente cliente, int year) {
+        int contador = 0;
+        NodoReserva actual = inicio;
+        while (actual != null) {
+            if (actual.getCliente().equals(cliente) &&
+                    actual.getFechaReserva().getYear() == year) {
+                contador++;
             }
             actual = actual.siguiente;
         }
-
-        double pctConfirmadas = (totalReservas > 0) ? (double) confirmadas / totalReservas * 100 : 0;
-        double pctPendientes = (totalReservas > 0) ? (double) pendientes / totalReservas * 100 : 0;
-        double pctCanceladas = (totalReservas > 0) ? (double) canceladas / totalReservas * 100 : 0;
-
-        System.out.println("\n=========================================");
-        System.out.println("📊 REPORTE DE ESTADO Y CANTIDADES DE RESERVAS");
-        System.out.println("=========================================");
-        System.out.printf("CANTIDAD TOTAL DE RESERVAS REALIZADAS: %d%n", totalReservas);
-        System.out.printf("Reservas CONFIRMADAS: %d (%.2f%%)%n", confirmadas, pctConfirmadas);
-        System.out.printf("Reservas PENDIENTES: %d (%.2f%%)%n", pendientes, pctPendientes);
-        System.out.printf("Reservas CANCELADAS: %d (%.2f%%)%n", canceladas, pctCanceladas);
-        System.out.println("-----------------------------------------");
+        return contador;
     }
 
-    // Metodo reporte: Calcular monto total facturado
-    public void calcularMontoTotalFacturado() {
-        if (esVacio()) {
-            System.out.println("No hay reservas para calcular la facturación.");
+    public void montoPorMedioDePago(ListaPagos listaPagos) {
+        System.out.println("\n=== MONTO RECAUDADO POR MEDIO DE PAGO ===");
+
+        if (listaPagos.getInicio() == null) {
+            System.out.println("No hay pagos registrados.");
             return;
         }
 
-        double montoTotalGeneral = 0.0;
-        NodoReserva actual = inicio;
-        while (actual != null) {
-            // Solo se factura lo Confirmado
-            if (actual.estado.equalsIgnoreCase("Confirmado")) {
-                montoTotalGeneral += actual.montoTotal; // Se usa el campo existente montoTotal
+        double efectivo = 0, tarjeta = 0, transferencia = 0;
+        NodoPago aux = listaPagos.getInicio();
+
+        while (aux != null) {
+            String medio = aux.getMedioPago();
+            double monto = aux.getMontoTotal();
+
+            if (medio != null) {
+                if (medio.equalsIgnoreCase("Efectivo")) {
+                    efectivo += monto;
+                } else if (medio.equalsIgnoreCase("Tarjeta de credito") || medio.equalsIgnoreCase("Tarjeta")) {
+                    tarjeta += monto;
+                } else if (medio.equalsIgnoreCase("Transferencia bancaria") || medio.equalsIgnoreCase("Transferencia")) {
+                    transferencia += monto;
+                }
             }
-            actual = actual.siguiente;
+            aux = aux.siguiente;
         }
 
-        System.out.println("\n=========================================");
-        System.out.println("💰 REPORTE DE MONTO TOTAL FACTURADO");
-        System.out.println("=========================================");
-        System.out.printf("MONTO TOTAL GENERAL FACTURADO (CONFIRMADO): $%,.2f%n", montoTotalGeneral);
-        System.out.println("-----------------------------------------");
+        double total = efectivo + tarjeta + transferencia;
+
+        System.out.println("\nEfectivo: $" + String.format("%.2f", efectivo));
+        if (total > 0) {
+            System.out.println("  → Porcentaje: " + String.format("%.2f", (efectivo / total * 100)) + "%");
+        }
+
+        System.out.println("\nTarjeta de crédito: $" + String.format("%.2f", tarjeta));
+        if (total > 0) {
+            System.out.println("  → Porcentaje: " + String.format("%.2f", (tarjeta / total * 100)) + "%");
+        }
+
+        System.out.println("\nTransferencia bancaria: $" + String.format("%.2f", transferencia));
+        if (total > 0) {
+            System.out.println("  → Porcentaje: " + String.format("%.2f", (transferencia / total * 100)) + "%");
+        }
+
+        System.out.println("\n─────────────────────────────────");
+        System.out.println("TOTAL RECAUDADO: $" + String.format("%.2f", total));
     }
 
-   
-    // Metodo reporte: Monto por paquete
-    public void reporteMontoPorPaquete(ListaPaquete listaPaquetes) {
-        if (esVacio()) {
-            System.out.println("No hay reservas para calcular el recaudo por paquete.");
-            return;
-        }
-
-        double totalGeneral = 0.0;
-        NodoReserva actual = inicio;
-
-        while (actual != null) {
-            if (actual.estado.equalsIgnoreCase("Confirmada")) {
-                totalGeneral += actual.montoTotal;
+    public NodoReserva buscarReservaPorCodigo(int codigoReserva) {
+        NodoReserva aux = inicio;
+        while (aux != null) {
+            if (aux.codigo == codigoReserva) {
+                return aux;
             }
-            actual = actual.siguiente;
+            aux = aux.siguiente;
         }
-
-        System.out.println("\n=========================================");
-        System.out.println("💵 REPORTE: MONTO POR PAQUETE Y DESTINO");
-        System.out.println("=========================================");
-        System.out.printf("MONTO TOTAL FACTURADO (CONFIRMADO): $%,.2f%n", totalGeneral);
-        System.out.println("-----------------------------------------");
-
-        actual = inicio;
-        while (actual != null) {
-            if (actual.estado.equalsIgnoreCase("Confirmada")) {
-                String codigoPaquete = actual.paquete.codigoPaquete; 
-                String destino = listaPaquetes.obtenerDestino(codigoPaquete); 
-                
-                double montoActual = actual.montoTotal; 
-                double porcentaje = (totalGeneral > 0) ? (montoActual / totalGeneral) * 100 : 0.0;
-
-                System.out.printf("  Reserva %d (Paquete %s - %s):%n",
-                        actual.codigo, codigoPaquete, destino);
-                System.out.printf("    Monto: $%,.2f | Contribuye: %.2f%%%n",
-                        montoActual, porcentaje);
-            }
-            actual = actual.siguiente;
-        }
-        System.out.println("-----------------------------------------");
+        return null;
     }
 
-    // Metodo reporte: Monto por servicio (Requiere campo 'costoServiciosAdicionales' en NodoReserva)
-    public void reporteMontoPorServicio() {
-        if (esVacio()) {
-            System.out.println("No hay reservas con servicios adicionales.");
-            return;
-        }
+    // Variable estática para almacenar el descuento total calculado
+    public static double ultimoMontoDescuento = 0;
 
-        double totalServiciosGeneral = 0.0;
-        NodoReserva actual = inicio;
-        
-        while (actual != null) {
-            if (actual.estado.equalsIgnoreCase("Confirmada")) {
-                totalServiciosGeneral += actual.costoServiciosAdicionales;
+    public static double calcularMontoReserva(NodoPaquete paquete, NodoServicioAdicional[] serviciosAdicionales,
+                                              int contadorServicios, int cantidadPersona, int opcionCodigo,
+                                              String codigoPromocional, ListaCodigoPromocion gestionCodigoPromocion,
+                                              ListaReservas gestionReserva, NodoCliente cliente) {
+        double precioPaquete = paquete.getPrecio();
+        double precioServicios = 0;
+        for (int i = 0; i < contadorServicios; i++) {
+            NodoServicioAdicional servicio = serviciosAdicionales[i];
+            String nombreServicio = servicio.getNombre();
+            double precio = servicio.getPrecio();
+            switch (nombreServicio) {
+                case "Seguro de viaje (PERSONA)":
+                    precioServicios += precio * cantidadPersona;
+                    break;
+                case "Guia privado (DIA)":
+                case "Transporte privado (DIA)":
+                    precioServicios += precio * paquete.getDuracionDias();
+                    break;
+                case "Entrada a atracciones (PERSONA)":
+                    precioServicios += precio * cantidadPersona;
+                    break;
+                case "Comidas incluidas (DIASxPERSONAS)":
+                    precioServicios += precio * paquete.getDuracionDias() * cantidadPersona;
+                    break;
+                default:
+                    System.out.println("Error: opción de servicio adicional inválida.");
+                    break;
             }
-            actual = actual.siguiente;
+        }
+        double montoTotal = precioPaquete * cantidadPersona + precioServicios;
+
+        System.out.println("Monto base de la reserva: $" + montoTotal);
+
+        double montoDescuentoAcumulado = 0; // Monto real descontado en pesos
+
+        // Descuento por código promocional
+        if (opcionCodigo == 1 && codigoPromocional != null && !codigoPromocional.isEmpty()) {
+            NodoCodigoPromocion promo = gestionCodigoPromocion.buscarCodigoPromocio(codigoPromocional);
+            if (promo != null) {
+                double descuento = promo.getDescuento();
+                double montoDescuento = montoTotal * descuento / 100;
+                montoTotal -= montoDescuento;
+                montoDescuentoAcumulado += montoDescuento;
+                System.out.println("Descuento por código (" + descuento + "%): -$" + montoDescuento);
+                System.out.println("Monto tras descuento por código: $" + montoTotal);
+            } else {
+                System.out.println("Código promocional no válido.");
+            }
         }
 
-        System.out.println("\n=========================================");
-        System.out.println("💰 REPORTE: MONTO POR SERVICIO ADICIONAL");
-        System.out.println("=========================================");
-        System.out.printf("MONTO TOTAL RECAUDADO POR SERVICIOS ADICIONALES (CONFIRMADO): $%,.2f%n", totalServiciosGeneral);
-        System.out.println("-----------------------------------------");
+        // Descuento por cliente frecuente
+        int reservasAnio = gestionReserva.contarReservasPorClienteEnAnio(cliente, LocalDate.now().getYear());
+        if (reservasAnio > 2) {
+            double descuento = 12;
+            double montoDescuento = montoTotal * descuento / 100;
+            montoTotal -= montoDescuento;
+            montoDescuentoAcumulado += montoDescuento;
+            System.out.println("Descuento por cliente frecuente (12%): -$" + montoDescuento);
+            System.out.println("Monto tras descuento por cliente frecuente: $" + montoTotal);
+        }
+
+        // Descuento por contratación anticipada
+        long diasAnticipacion = java.time.temporal.ChronoUnit.DAYS.between(LocalDate.now(), paquete.getInicioFechaViaje());
+        if (diasAnticipacion > 60) {
+            double descuento = 8;
+            double montoDescuento = montoTotal * descuento / 100;
+            montoTotal -= montoDescuento;
+            montoDescuentoAcumulado += montoDescuento;
+            System.out.println("Descuento por contratación anticipada (8%): -$" + montoDescuento);
+            System.out.println("Monto tras descuento por contratación anticipada: $" + montoTotal);
+        }
+
+        // Descuento por grupo grande
+        if (cantidadPersona > 10) {
+            double descuento = 10;
+            double montoDescuento = montoTotal * descuento / 100;
+            montoTotal -= montoDescuento;
+            montoDescuentoAcumulado += montoDescuento;
+            System.out.println("Descuento por grupo grande (10%): -$" + montoDescuento);
+            System.out.println("Monto tras descuento por grupo grande: $" + montoTotal);
+        }
+
+        System.out.println("Monto final de la reserva: $" + montoTotal);
+
+        // Guardar el monto de descuento para usarlo en la creación de la reserva
+        ultimoMontoDescuento = montoDescuentoAcumulado;
+
+        return montoTotal;
     }
 
-    // Metodo reporte: Monto total descuentos (Requiere campo 'montoDescuento' en NodoReserva)
-    public void calcularMontoTotalDescuentos() {
+
+    // Metodo 5 reportes
+    public void montoTotalDescuentos() {
+        System.out.println("\n=== MONTO TOTAL DE DESCUENTOS APLICADOS ===");
+
         if (esVacio()) {
             System.out.println("No hay reservas registradas.");
             return;
         }
 
-        double totalDescuentos = 0.0;
-        NodoReserva actual = inicio;
-        while (actual != null) {
-            totalDescuentos += actual.montoDescuento;
-            actual = actual.siguiente;
-        }
+        double totalDescuentos = 0;
+        int cantidadReservasConDescuento = 0;
+        double montoSinDescuentos = 0;
+        double montoConDescuentos = 0;
 
-        System.out.println("\n=========================================");
-        System.out.println("🎁 REPORTE DE DESCUENTOS APLICADOS");
-        System.out.println("=========================================");
-        System.out.printf("MONTO TOTAL DE DESCUENTOS APLICADOS: $%,.2f%n", totalDescuentos);
-        System.out.println("-----------------------------------------");
-    }
-
-    // Metodo reporte: Porcentaje de servicios vendidos
-    public void reportePorcentajeServiciosVendidos() {
-        if (esVacio()) {
-            System.out.println("No hay reservas para calcular el porcentaje.");
-            return;
-        }
-
-        int totalReservasConfirmadas = 0;
-        int reservasConServicios = 0;
-
-        NodoReserva actual = inicio;
-        while (actual != null) {
-            if (actual.estado.equalsIgnoreCase("Confirmada")) {
-                totalReservasConfirmadas++;
-
-                if (actual.servicioAdicional != null) {
-                    reservasConServicios++;
-                }
+        NodoReserva aux = inicio;
+        while (aux != null) {
+            if (aux.montoDescuento > 0) {
+                cantidadReservasConDescuento++;
             }
-            actual = actual.siguiente;
+            totalDescuentos += aux.montoDescuento;
+            montoConDescuentos += aux.montoTotal;
+            montoSinDescuentos += (aux.montoTotal + aux.montoDescuento);
+            aux = aux.siguiente;
         }
 
-        double porcentaje = (totalReservasConfirmadas > 0)
-                ? (double) reservasConServicios / totalReservasConfirmadas * 100
-                : 0.0;
+        System.out.println("\nReservas con descuento: " + cantidadReservasConDescuento);
+        System.out.println("Monto sin descuentos: $" + String.format("%.2f", montoSinDescuentos));
+        System.out.println("Monto con descuentos: $" + String.format("%.2f", montoConDescuentos));
+        System.out.println("\n─────────────────────────────────");
+        System.out.println("TOTAL DESCUENTOS APLICADOS: $" + String.format("%.2f", totalDescuentos));
 
-        System.out.println("\n=========================================");
-        System.out.println("📈 REPORTE: PORCENTAJE DE SERVICIOS VENDIDOS");
-        System.out.println("=========================================");
-        System.out.printf("Total de Reservas Confirmadas: %d%n", totalReservasConfirmadas);
-        System.out.printf("Reservas con Servicios Adicionales: %d%n", reservasConServicios);
-        System.out.println("-----------------------------------------");
-        System.out.printf("PORCENTAJE DE RESERVAS CON SERVICIOS: %.2f%%%n", porcentaje);
-        System.out.println("-----------------------------------------");
+        if (montoSinDescuentos > 0) {
+            double porcentajeDescuento = (totalDescuentos / montoSinDescuentos) * 100;
+            System.out.println("Porcentaje de descuento promedio: " + String.format("%.2f", porcentajeDescuento) + "%");
+        }
     }
-    
-    // Metodo reporte: Cliente que más y menos gastó (Movido de ListaCliente)
-    public void reporteClienteMayorMenorGasto(ListaCliente listaClientes) {
+
+    // Metodo 6 reportes
+    public void clienteMayorMenorGasto() {
         if (esVacio()) {
-            System.out.println("No hay reservas para determinar el mayor/menor gasto.");
+            System.out.println("No hay reservas registradas");
             return;
         }
 
-        String docMayorGasto = "";
-        double mayorGasto = -1.0;
-        String docMenorGasto = "";
+        // Recorrer reservas confirmadas y sumar por cliente
+        NodoReserva aux = inicio;
+        NodoCliente clienteMayor = null;
+        NodoCliente clienteMenor = null;
+        double mayorGasto = 0;
         double menorGasto = Double.MAX_VALUE;
 
-        NodoReserva actual = inicio;
-        while (actual != null) {
-            if (actual.estado.equalsIgnoreCase("Confirmado")) {
-                double gastoActual = actual.montoTotal;
+        // Usamos un enfoque simple: recorremos todas las reservas
+        while (aux != null) {
+            if (aux.estado.equalsIgnoreCase("Confirmado")) {
+                NodoCliente clienteActual = aux.cliente;
+                double gastoTotal = calcularGastoPorCliente(clienteActual);
 
-                if (actual.cliente != null) {
+                if (gastoTotal > mayorGasto) {
+                    mayorGasto = gastoTotal;
+                    clienteMayor = clienteActual;
+                }
+                if (gastoTotal < menorGasto) {
+                    menorGasto = gastoTotal;
+                    clienteMenor = clienteActual;
+                }
+            }
+            aux = aux.siguiente;
+        }
 
-                    // Mayor gasto
-                    if (gastoActual > mayorGasto) {
-                        mayorGasto = gastoActual;
-                        docMayorGasto = actual.cliente.documento;
+        if (clienteMayor != null) {
+            System.out.println("Cliente que más gastó: " + clienteMayor.getNombre() + " - $" + mayorGasto);
+        }
+        if (clienteMenor != null && menorGasto != Double.MAX_VALUE) {
+            System.out.println("Cliente que menos gastó: " + clienteMenor.getNombre() + " - $" + menorGasto);
+        }
+    }
+
+    private double calcularGastoPorCliente(NodoCliente cliente) {
+        double total = 0;
+        NodoReserva aux = inicio;
+        while (aux != null) {
+            if (aux.estado.equalsIgnoreCase("Confirmado") && aux.cliente.equals(cliente)) {
+                total += aux.montoTotal;
+            }
+            aux = aux.siguiente;
+        }
+        return total;
+    }
+
+    //Metodo 7 reportes
+    public void porcentajeEstadoReservas() {
+        int total = 0, confirmadas = 0, pendientes = 0, canceladas = 0;
+        NodoReserva aux = inicio;
+        while (aux != null) {
+            total++;
+            if (aux.estado.equalsIgnoreCase("Confirmado")) {
+                confirmadas++;
+            } else if (aux.estado.equalsIgnoreCase("Pendiente")) {
+                pendientes++;
+            } else if (aux.estado.equalsIgnoreCase("Cancelado")) {
+                canceladas++;
+            }
+            aux = aux.siguiente;
+        }
+
+        if (total > 0) {
+            System.out.println("Total de reservas: " + total);
+            System.out.println("Confirmadas: " + confirmadas + " (" + (confirmadas * 100.0 / total) + "%)");
+            System.out.println("Pendientes: " + pendientes + " (" + (pendientes * 100.0 / total) + "%)");
+            System.out.println("Canceladas: " + canceladas + " (" + (canceladas * 100.0 / total) + "%)");
+        } else {
+            System.out.println("No hay reservas registradas");
+        }
+    }
+
+    //Metodo 8 reportes
+    public void ocupacionPorPaquete() {
+        if (esVacio()) {
+            System.out.println("No hay reservas registradas");
+            return;
+        }
+
+        NodoReserva aux = inicio;
+        System.out.println("\n=== OCUPACIÓN POR PAQUETE ===");
+        while (aux != null) {
+            if (aux.estado.equalsIgnoreCase("Confirmado")) {
+                NodoPaquete paquete = aux.paquete;
+                int ocupadas = paquete.plazasTotales - paquete.plazaDiponible;
+                double porcentaje = (ocupadas * 100.0) / paquete.plazasTotales;
+                System.out.println("Destino: " + paquete.destino + " | Ocupadas: " + ocupadas + "/" +
+                        paquete.plazasTotales + " (" + String.format("%.2f", porcentaje) + "%)");
+            }
+            aux = aux.siguiente;
+        }
+    }
+
+    //Metodo 9 reportes
+    public void porcentajeReservasPorTipo() {
+        int totalNacional = 0, totalInternacional = 0;
+        NodoReserva aux = inicio;
+        while (aux != null) {
+            if (aux.estado.equalsIgnoreCase("Confirmado")) {
+                if (aux.paquete.tipoPaquete.equalsIgnoreCase("Nacional")) {
+                    totalNacional++;
+                } else if (aux.paquete.tipoPaquete.equalsIgnoreCase("Internacional")) {
+                    totalInternacional++;
+                }
+            }
+            aux = aux.siguiente;
+        }
+
+        int total = totalNacional + totalInternacional;
+        if (total > 0) {
+            System.out.println("Total de reservas confirmadas: " + total);
+            System.out.println("Nacional: " + totalNacional + " (" + (totalNacional * 100.0 / total) + "%)");
+            System.out.println("Internacional: " + totalInternacional + " (" + (totalInternacional * 100.0 / total) + "%)");
+        } else {
+            System.out.println("No hay reservas confirmadas");
+        }
+    }
+
+    //Metodo 10 reportes
+    public void promedioPlazasVendidasPorPaquete() {
+        if (esVacio()) {
+            System.out.println("No hay reservas registradas");
+            return;
+        }
+
+        int totalPlazasVendidas = 0;
+        int totalReservas = 0;
+        NodoReserva aux = inicio;
+        while (aux != null) {
+            if (aux.estado.equalsIgnoreCase("Confirmado")) {
+                totalPlazasVendidas += aux.cantidadPersonas;
+                totalReservas++;
+            }
+            aux = aux.siguiente;
+        }
+
+        if (totalReservas > 0) {
+            double promedio = (double) totalPlazasVendidas / totalReservas;
+            System.out.println("Promedio de plazas vendidas por paquete: " + String.format("%.2f", promedio));
+        } else {
+            System.out.println("No hay reservas confirmadas");
+        }
+    }
+
+    // Metodo 11 reportes
+    public void porcentajeServiciosVendidos() {
+        int totalReservas = 0;
+        int reservasConServicios = 0;
+        NodoReserva aux = inicio;
+
+        while (aux != null) {
+            if (aux.estado.equalsIgnoreCase("Confirmado")) {
+                totalReservas++;
+                if (aux.servicioAdicional != null && aux.servicioAdicional.length > 0) {
+                    boolean tieneServicio = false;
+                    for (NodoServicioAdicional servicio : aux.servicioAdicional) {
+                        if (servicio != null) {
+                            tieneServicio = true;
+                            break;
+                        }
                     }
-                    // Menor gasto
-                    if (gastoActual < menorGasto) {
-                        menorGasto = gastoActual;
-                        docMenorGasto = actual.cliente.documento;
+                    if (tieneServicio) {
+                        reservasConServicios++;
                     }
                 }
             }
-            actual = actual.siguiente;
+            aux = aux.siguiente;
         }
 
-        System.out.println("\n=========================================");
-        System.out.println("⭐ REPORTE: CLIENTE CON MAYOR Y MENOR GASTO");
-        System.out.println("=========================================");
-
-        if (mayorGasto != -1.0) {
-            System.out.println("🥇 CLIENTE CON MAYOR GASTO:");
-            listaClientes.mostrarDatosClientePorDocumento(docMayorGasto);
-            System.out.printf("  Monto total: $%,.2f%n", mayorGasto);
-            System.out.println("-----------------------------------------");
-
-            System.out.println("📉 CLIENTE CON MENOR GASTO:");
-            listaClientes.mostrarDatosClientePorDocumento(docMenorGasto);
-            System.out.printf("  Monto total: $%,.2f%n", menorGasto);
-            System.out.println("-----------------------------------------");
+        if (totalReservas > 0) {
+            double porcentaje = (reservasConServicios * 100.0) / totalReservas;
+            System.out.println("Reservas con servicios adicionales: " + reservasConServicios + "/" + totalReservas +
+                    " (" + String.format("%.2f", porcentaje) + "%)");
         } else {
-            System.out.println("No hay reservas confirmadas para analizar el gasto.");
+            System.out.println("No hay reservas confirmadas");
         }
     }
 }

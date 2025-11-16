@@ -2,8 +2,6 @@ package Menu;
 
 import EstructuraNodos.ColaClientes;
 import EstructuraNodos.PilaServicios;
-import EstructuraNodos.ListaCliente;
-import EstructuraNodos.NodoCliente;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -14,30 +12,23 @@ public class GestionSimulacion {
             ColaClientes colaAtencion, 
             ColaClientes colaEspera, 
             PilaServicios pilaServicios, 
-            ListaCliente listaClientes, // Para buscar clientes
             Scanner sc) {
 
         int opcion = 0;
         do {
-            System.out.println("\n-- SIMULACIÓN DE COLAS Y PILAS --");
-            System.out.println("1. Agregar cliente a Cola de Atención");
-            System.out.println("2. Atender cliente (Desencolar)");
-            System.out.println("3. Mostrar Cola de Atención");
-            System.out.println("---");
-            System.out.println("4. Agregar cliente a Lista de Espera");
-            System.out.println("5. Atender cliente (Lista de Espera)");
-            System.out.println("6. Mostrar Lista de Espera");
-            System.out.println("---");
-            System.out.println("7. Apilar Servicio Vendido (Simulación)");
-            System.out.println("8. Desapilar Último Servicio Vendido");
-            System.out.println("9. Mostrar Pila de Servicios Vendidos");
-            System.out.println("---");
-            System.out.println("10. Volver al Menú Principal");
-            System.out.print("Seleccione una opción: ");
+            System.out.println("\n --VISUALIZACIÓN DE COLAS Y PILAS-- ");
+            System.out.println("  (Se actualizan automáticamente)");
+            System.out.println();
+            System.out.println("1. Ver Cola de Atención Actual");
+            System.out.println("2. Ver Lista de Espera");
+            System.out.println("3. Ver Historial de Servicios Vendidos");
+            System.out.println("4. Ver Estadísticas Generales");
+            System.out.println("5. Volver al Menú Principal");
+            System.out.print("\nSeleccione una opción: ");
 
             try {
                 opcion = sc.nextInt();
-                sc.nextLine(); // Limpiar buffer
+                sc.nextLine();
             } catch (InputMismatchException e) {
                 System.out.println("Error: Debe ingresar un número.");
                 sc.nextLine();
@@ -45,65 +36,76 @@ public class GestionSimulacion {
             }
 
             switch (opcion) {
-                case 1: // Agregar a Cola de Atención
-                    System.out.println("Ingrese documento del cliente a encolar:");
-                    String doc1 = sc.nextLine();
-                    NodoCliente cliente1 = listaClientes.buscarCliente(doc1);
-                    if (cliente1 != null) {
-                        colaAtencion.encolar(cliente1.getNombre()); // Guardamos solo el nombre
-                    } else {
-                        System.out.println("Cliente no encontrado.");
-                    }
-                    break;
-                case 2: // Atender Cola
-                    Object atendido1 = colaAtencion.desencolar();
-                    if (atendido1 != null) {
-                        System.out.println("Cliente atendido: " + atendido1.toString());
-                    }
-                    break;
-                case 3: // Mostrar Cola Atención
+                case 1:
                     colaAtencion.mostrar();
                     break;
-                case 4: // Agregar a Lista de Espera
-                    System.out.println("Ingrese documento del cliente a encolar en espera:");
-                    String doc2 = sc.nextLine();
-                    NodoCliente cliente2 = listaClientes.buscarCliente(doc2);
-                    if (cliente2 != null) {
-                        colaEspera.encolar(cliente2.getNombre()); // Guardamos solo el nombre
-                    } else {
-                        System.out.println("Cliente no encontrado.");
-                    }
-                    break;
-                case 5: // Atender Lista de Espera
-                    Object atendido2 = colaEspera.desencolar();
-                    if (atendido2 != null) {
-                        System.out.println("Cliente de lista de espera atendido: " + atendido2.toString());
-                    }
-                    break;
-                case 6: // Mostrar Lista de Espera
+
+                case 2:
                     colaEspera.mostrar();
                     break;
-                case 7: // Apilar Servicio
-                    System.out.println("Simulación: Ingrese nombre del servicio vendido:");
-                    String servicio = sc.nextLine();
-                    pilaServicios.apilar(servicio);
-                    break;
-                case 8: // Desapilar Servicio
-                    Object ultimoServicio = pilaServicios.desapilar();
-                    if (ultimoServicio != null) {
-                        System.out.println("Servicio desapilado: " + ultimoServicio.toString());
-                    }
-                    break;
-                case 9: // Mostrar Pila
+
+                case 3:
                     pilaServicios.mostrar();
                     break;
-                case 10:
+
+                case 4:
+                    mostrarEstadisticas(colaAtencion, colaEspera, pilaServicios);
+                    break;
+
+                case 5:
                     System.out.println("Volviendo al menú principal...");
                     break;
+
                 default:
                     System.out.println("Opción no válida.");
             }
 
-        } while (opcion != 10);
+        } while (opcion != 5);
+    }
+
+    /**
+     * Muestra estadísticas generales de las colas y pilas
+     */
+    private static void mostrarEstadisticas(ColaClientes colaAtencion,
+                                           ColaClientes colaEspera,
+                                           PilaServicios pilaServicios) {
+
+        System.out.println("\n ---ESTADÍSTICAS DE COLAS Y PILAS---");
+
+        // Contar elementos en cada estructura
+        int enAtencion = contarElementos(colaAtencion);
+        int enEspera = contarElementos(colaEspera);
+        int serviciosVendidos = contarElementos(pilaServicios);
+
+        System.out.println("\n COLAS:");
+        System.out.println("  • Clientes en atención: " + enAtencion);
+        System.out.println("  • Clientes en lista de espera: " + enEspera);
+        System.out.println("  • Total en colas: " + (enAtencion + enEspera));
+
+        System.out.println("\n SERVICIOS:");
+        System.out.println("  • Servicios vendidos registrados: " + serviciosVendidos);
+
+    }
+
+
+    private static int contarElementos(Object estructura) {
+        int contador = 0;
+        try {
+            if (estructura instanceof ColaClientes) {
+                ColaClientes cola = (ColaClientes) estructura;
+                if (!cola.esVacia()) {
+                    // Recorrer para contar (sin mostrar)
+                    contador = cola.contarElementos();
+                }
+            } else if (estructura instanceof PilaServicios) {
+                PilaServicios pila = (PilaServicios) estructura;
+                if (!pila.esVacia()) {
+                    contador = pila.contarElementos();
+                }
+            }
+        } catch (Exception e) {
+            contador = 0;
+        }
+        return contador;
     }
 }

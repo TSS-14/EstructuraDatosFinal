@@ -1,7 +1,5 @@
 package EstructuraNodos;
 
-import EstructuraNodos.ListaReservas; // Necesario para el reporte de monto por edad
-
 public class ListaCliente {
     private NodoCliente inicio;
 
@@ -18,11 +16,7 @@ public class ListaCliente {
     // Metodo para agregar cliente
     public void agregarCliente(String documento, String tipoCliente, String telefono, String correo,
             String genero, int edad, String nombre) {
-        // Verifica si ya existe
-        if (buscarCliente(documento) != null) {
-            System.out.println("Error, el numero de documento ya esta registrado");
-            return;
-        }
+
         NodoCliente nuevo = new NodoCliente(documento, tipoCliente, telefono, correo, genero, edad, nombre);
         if (esVacio()) {
             inicio = nuevo;
@@ -32,6 +26,18 @@ public class ListaCliente {
             inicio = nuevo;
         }
         System.out.println("Cliente agregado correctamente");
+    }
+
+    //Metodo para clientes con el mismo ID
+    public boolean existeClienteRepetido(String documento){
+        NodoCliente actual = inicio;
+        while (actual != null){
+            if (actual.documento.equalsIgnoreCase(documento)){
+                return true;
+            }
+            actual = actual.siguiente;
+        }
+        return false;
     }
 
     // Meotodo para buscar repeticiones (devuelve el nodo)
@@ -52,7 +58,7 @@ public class ListaCliente {
     // Metodo para eliminar cliente
     public void eliminarCliente(String documento) {
         if (esVacio()) {
-            System.out.println("La lista esta vacia!");
+            System.out.println("No hay clientes registrados aún");
             return;
         }
 
@@ -92,7 +98,7 @@ public class ListaCliente {
     // Metodo para mostrar todos los clientes
     public void mostrarClientes() {
         if (esVacio()) {
-            System.out.println("La lista esta vacia!");
+            System.out.println("No hay clientes registrados aún");
             return;
         }
         
@@ -101,6 +107,7 @@ public class ListaCliente {
 
         int contador = 1;
         while (t != null) {
+            System.out.println("---------------");
             System.out.println("Cliente # " + contador++);
             System.out.println("---------------");
             System.out.println("Documento: " + t.documento + "\nNombre: " + t.nombre +
@@ -110,162 +117,63 @@ public class ListaCliente {
         }
     }
 
-    
-    // Metodo auxiliar para obtener la edad, usado por el reporte de monto recaudado
-    public int obtenerEdadPorDocumento(String documento) {
-        NodoCliente actual = inicio;
-        while (actual != null) {
-            if (actual.documento.equals(documento)) {
-                return actual.edad;
-            }
-            actual = actual.siguiente;
-        }
-        return -1; // Cliente no encontrado
-    }
-
-    // Metodo auxiliar para mostrar datos, usado por el reporte Mayor/Menor Gasto en ListaReservas
-    public void mostrarDatosClientePorDocumento(String documentoBuscado) {
-        NodoCliente actual = inicio;
-        
-        while (actual != null) {
-            if (actual.documento.equals(documentoBuscado)) { 
-                System.out.println("    Nombre: " + actual.nombre);
-                System.out.println("    Documento: " + actual.documento);
-                System.out.println("    Edad: " + actual.edad);
-                System.out.println("    Teléfono: " + actual.telefono);
-                System.out.println("    Tipo: " + actual.tipoCliente);
-                return; 
-            }
-            actual = actual.siguiente;
-        }
-        
-        System.out.println("    ERROR: Cliente no encontrado con documento: " + documentoBuscado);
-    }
-
-
-    // Metodo reporte : Clientes atendidos por genero
-    public void contarClientesPorGenero() {
-        if (esVacio()) {
-            System.out.println("No hay clientes registrados para generar el reporte.");
-            return;
-        }
-
-        int masculino = 0;
-        int femenino = 0;
-        int otros = 0;
-
-        NodoCliente actual = inicio;
-        while (actual != null) {
-
-            String genero = actual.genero.toLowerCase();
-
-            if (genero.equals("masculino")) {
+    //Metodo 12 de reportes
+    public void clientesPorGenero() {
+        int masculino = 0, femenino = 0, otro = 0;
+        NodoCliente aux = inicio;
+        while (aux != null) {
+            if (aux.genero.equalsIgnoreCase("Masculino") || aux.genero.equalsIgnoreCase("M")) {
                 masculino++;
-            } else if (genero.equals("femenino")) {
+            } else if (aux.genero.equalsIgnoreCase("Femenino") || aux.genero.equalsIgnoreCase("F")) {
                 femenino++;
             } else {
-                otros++;
+                otro++;
             }
-
-            actual = actual.siguiente;
+            aux = aux.siguiente;
         }
 
-        System.out.println("\n=========================================");
-        System.out.println("📊 REPORTE DE CLIENTES ATENDIDOS POR GÉNERO");
-        System.out.println("=========================================");
-        System.out.println("Total Clientes Masculinos: " + masculino);
-        System.out.println("Total Clientes Femeninos: " + femenino);
-
-        if (otros > 0) {
-            System.out.println("Clientes con género no especificado/otro: " + otros);
+        int total = masculino + femenino + otro;
+        System.out.println("\n=== CLIENTES POR GÉNERO ===");
+        System.out.println("Total de clientes: " + total);
+        if (total > 0) {
+            System.out.println("Masculino: " + masculino + " (" + String.format("%.2f", masculino * 100.0 / total) + "%)");
+            System.out.println("Femenino: " + femenino + " (" + String.format("%.2f", femenino * 100.0 / total) + "%)");
+            if (otro > 0) {
+                System.out.println("Otro: " + otro + " (" + String.format("%.2f", otro * 100.0 / total) + "%)");
+            }
         }
-        System.out.println("-----------------------------------------");
-        System.out.println("Total de clientes en el sistema: " + (masculino + femenino + otros));
-        System.out.println("-----------------------------------------");
     }
 
-    // Metodo reporte : Clientes por rango de edad
-    public void contarClientesPorRangoEdad() {
-        if (esVacio()) {
-            System.out.println("No hay clientes registrados para generar el reporte.");
-            return;
-        }
+    //Metodo 13 de clientes
+    public void estadisticasPorEdad() {
+        int menores18 = 0, entre18y30 = 0, entre31y50 = 0, entre51y65 = 0, mayores65 = 0;
+        NodoCliente aux = inicio;
 
-        int rangoMenores = 0; // < 18
-        int rangoAdultoJoven = 0; // 18-40
-        int rangoAdulto = 0; // 41-65
-        int rangoMayor = 0; // > 65
-
-        NodoCliente actual = inicio;
-        while (actual != null) {
-            int edad = actual.edad;
-
+        while (aux != null) {
+            int edad = aux.edad;
             if (edad < 18) {
-                rangoMenores++;
-            } else if (edad >= 18 && edad <= 40) {
-                rangoAdultoJoven++;
-            } else if (edad >= 41 && edad <= 65) {
-                rangoAdulto++;
-            } else { // edad > 65
-                rangoMayor++;
+                menores18++;
+            } else if (edad >= 18 && edad <= 30) {
+                entre18y30++;
+            } else if (edad >= 31 && edad <= 50) {
+                entre31y50++;
+            } else if (edad >= 51 && edad <= 65) {
+                entre51y65++;
+            } else {
+                mayores65++;
             }
-            actual = actual.siguiente;
+            aux = aux.siguiente;
         }
 
-        System.out.println("\n=========================================");
-        System.out.println("👴 REPORTE DE CLIENTES POR RANGO DE EDAD");
-        System.out.println("=========================================");
-        System.out.println("Clientes (<18 años): " + rangoMenores);
-        System.out.println("Clientes (18-40 años): " + rangoAdultoJoven);
-        System.out.println("Clientes (41-65 años): " + rangoAdulto);
-        System.out.println("Clientes (>65 años): " + rangoMayor);
-        System.out.println("-----------------------------------------");
-    }
-
-    // Metodo reporte: Monto recaudado por edad
-    public void reporteMontoRecaudadoPorEdad(ListaReservas listaReservas) {
-        if (inicio == null || listaReservas.esVacio()) {
-            System.out.println(
-                    "No hay suficientes datos (clientes o reservas) para generar el reporte de facturación por edad.");
-            return;
+        int total = menores18 + entre18y30 + entre31y50 + entre51y65 + mayores65;
+        System.out.println("\n=== CLIENTES POR RANGO DE EDAD ===");
+        System.out.println("Total de clientes: " + total);
+        if (total > 0) {
+            System.out.println("Menores de 18: " + menores18 + " (" + String.format("%.2f", menores18 * 100.0 / total) + "%)");
+            System.out.println("18-30 años: " + entre18y30 + " (" + String.format("%.2f", entre18y30 * 100.0 / total) + "%)");
+            System.out.println("31-50 años: " + entre31y50 + " (" + String.format("%.2f", entre31y50 * 100.0 / total) + "%)");
+            System.out.println("51-65 años: " + entre51y65 + " (" + String.format("%.2f", entre51y65 * 100.0 / total) + "%)");
+            System.out.println("Mayores de 65: " + mayores65 + " (" + String.format("%.2f", mayores65 * 100.0 / total) + "%)");
         }
-
-        double[] montosPorRango = new double[4];
-        double totalRecaudadoGeneral = 0.0;
-
-        NodoReserva reservaActual = listaReservas.getInicio();
-        while (reservaActual != null) {
-            if (reservaActual.estado.equalsIgnoreCase("Confirmado")) {
-
-                int edad = this.obtenerEdadPorDocumento(reservaActual.documentoCliente); 
-                double monto = reservaActual.montoTotal;
-
-                if (edad != -1) { 
-                    totalRecaudadoGeneral += monto;
-
-                    if (edad < 18) {
-                        montosPorRango[0] += monto;
-                    } else if (edad >= 18 && edad <= 40) {
-                        montosPorRango[1] += monto;
-                    } else if (edad >= 41 && edad <= 65) {
-                        montosPorRango[2] += monto;
-                    } else { // edad > 65
-                        montosPorRango[3] += monto;
-                    }
-                }
-            }
-            reservaActual = reservaActual.siguiente;
-        }
-
-        System.out.println("\n=========================================");
-        System.out.println(" REPORTE: MONTO RECAUDADO POR RANGO DE EDAD");
-        System.out.println("=========================================");
-        System.out.printf("Total Recaudado General (Confirmado): $%,.2f%n", totalRecaudadoGeneral);
-        System.out.println("-----------------------------------------");
-        System.out.printf("Menores (<18): $%,.2f%n", montosPorRango[0]);
-        System.out.printf("Jóvenes (18-40): $%,.2f%n", montosPorRango[1]);
-        System.out.printf("Adultos (41-65): $%,.2f%n", montosPorRango[2]);
-        System.out.printf("Mayores (>65): $%,.2f%n", montosPorRango[3]);
-        System.out.println("-----------------------------------------");
     }
 }

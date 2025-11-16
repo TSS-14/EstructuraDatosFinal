@@ -11,40 +11,57 @@ public class PilaServicios {
         return cima == null;
     }
 
-    // Método 'push' (Apilar)
+    //Push
     public void apilar(Object servicio) {
         NodoSimple nuevo = new NodoSimple(servicio);
         if (!esVacia()) {
             nuevo.siguiente = cima;
         }
         cima = nuevo;
-        System.out.println("Servicio apilado.");
     }
 
-    // Método 'pop' (Desapilar)
+    //Pop
     public Object desapilar() {
         if (esVacia()) {
-            System.out.println("La pila de servicios está vacía.");
             return null;
         }
-        Object servicio = cima.dato; // Guardamos el dato
-        cima = cima.siguiente;     // Movemos la cima
-        return servicio;           // Devolvemos el dato
+        Object servicio = cima.dato;
+        cima = cima.siguiente;
+        return servicio;
     }
 
-    // Método para mostrar
     public void mostrar() {
         if (esVacia()) {
-            System.out.println("PILA DE SERVICIOS VACÍA");
+            System.out.println("\n══════════════════════════════════════");
+            System.out.println("  HISTORIAL DE SERVICIOS VENDIDOS");
+            System.out.println("══════════════════════════════════════");
+            System.out.println("No hay servicios registrados aún.");
             return;
         }
 
         NodoSimple temp = cima;
-        System.out.println("== PILA DE SERVICIOS VENDIDOS (Más reciente primero) ==");
+        int contador = 1;
+        System.out.println("\n══════════════════════════════════════");
+        System.out.println("  HISTORIAL DE SERVICIOS VENDIDOS");
+        System.out.println("══════════════════════════════════════");
+        System.out.println("(Más reciente primero)\n");
+
         while (temp != null) {
-            // Asumimos que guardamos un String o un objeto con .toString()
-            System.out.println("-> " + temp.dato.toString()); 
+            System.out.println(contador + ". " + temp.dato.toString());
+            temp = temp.siguiente;
+            contador++;
+        }
+        System.out.println("\nTotal de servicios vendidos: " + (contador - 1));
+        System.out.println("══════════════════════════════════════\n");
+    }
+
+    public int contarElementos() {
+        int contador = 0;
+        NodoSimple temp = cima;
+        while (temp != null) {
+            contador++;
             temp = temp.siguiente;
         }
+        return contador;
     }
 }

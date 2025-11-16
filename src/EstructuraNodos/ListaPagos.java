@@ -35,7 +35,6 @@ public class ListaPagos {
             System.out.println("Código de reserva: " + actual.codigoReserva);
             System.out.println("Monto: $" + actual.monto);
             System.out.println("Método de pago: " + actual.metodoPago);
-            System.out.println("Estado: " + actual.estado);
             System.out.println("Fecha: " + actual.fechaPago);
             System.out.println("--------------------");
             actual = actual.siguiente;
@@ -53,46 +52,38 @@ public class ListaPagos {
         return null;
     }
 
-    public void confirmarPago(int codigoPago) {
-        NodoPago pago = buscarPago(codigoPago);
-        if (pago != null) {
-            pago.estado = "Confirmado";
-            System.out.println("Pago confirmado exitosamente");
-        } else {
-            System.out.println("Pago no encontrado");
-        }
-    }
 
-    public void cancelarPago(int codigoPago) {
-        NodoPago pago = buscarPago(codigoPago);
-        if (pago != null) {
-            pago.estado = "Cancelado";
-            System.out.println("Pago cancelado exitosamente");
-        } else {
-            System.out.println("Pago no encontrado");
+    public void mostrarPorcentajePorMedio() {
+        if (esVacio()){
+            System.out.println("No hay pagos registrados");
+            return;
         }
-    }
 
-    public void mostrarPagosPorReserva(int codigoReserva) {
-        boolean encontrado = false;
+        int total = 0;
+        int efectivo = 0, tarjetaCredito = 0, transferencia = 0;
+
         NodoPago actual = inicio;
-        
-        System.out.println("\n=== PAGOS DE LA RESERVA " + codigoReserva + " ===");
-        while (actual != null) {
-            if (actual.codigoReserva == codigoReserva) {
-                System.out.println("\nCódigo de pago: " + actual.codigoPago);
-                System.out.println("Monto: $" + actual.monto);
-                System.out.println("Método de pago: " + actual.metodoPago);
-                System.out.println("Estado: " + actual.estado);
-                System.out.println("Fecha: " + actual.fechaPago);
-                System.out.println("--------------------");
-                encontrado = true;
+        while (actual != null){
+            String metodo = actual.metodoPago.trim().toLowerCase();
+            if (metodo.contains("efectivo")){
+                efectivo++;
+            } else if (metodo.contains("tarjeta")) {
+                tarjetaCredito++;
+            } else if (metodo.contains("transferencia")) {
+                transferencia++;
             }
+            total++;
             actual = actual.siguiente;
         }
-        
-        if (!encontrado) {
-            System.out.println("No se encontraron pagos para la reserva " + codigoReserva);
-        }
+        System.out.println("\n=== PORCENTAJE POR MÉTODO DE PAGO ===");
+        System.out.printf("Efectivo: %.2f%% (%d pagos)\n", (efectivo * 100.0) / total, efectivo);
+        System.out.printf("Tarjeta de crédito: %.2f%% (%d pagos)\n", (tarjetaCredito * 100.0) / total, tarjetaCredito);
+        System.out.printf("Transferencia: %.2f%% (%d pagos)\n", (transferencia * 100.0) / total, transferencia);
+        System.out.println("Total de pagos: " + total);
     }
+
+    public NodoPago getInicio() {
+        return  this.inicio;
+    }
+
 }
